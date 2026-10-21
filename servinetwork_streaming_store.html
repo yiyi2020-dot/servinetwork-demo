@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ServiNetwork | Cuentas de Streaming Premium</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#080808',
+                        cardBg: '#121215',
+                        cardHover: '#1a1a20',
+                        brandRed: '#ff1e38',
+                        brandRedHover: '#e0162f',
+                        brandRedLight: '#ff4d61',
+                    },
+                    boxShadow: {
+                        'neon': '0 0 25px rgba(255, 30, 56, 0.35)',
+                        'neon-lg': '0 0 50px rgba(255, 30, 56, 0.5)',
+                        'card-glow': '0 10px 30px -10px rgba(255, 30, 56, 0.2)',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #080808;
+            color: #f3f4f6;
+            overflow-x: hidden;
+        }
+        /* Custom Glassmorphism */
+        .glass {
+            background: rgba(18, 18, 21, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 30, 56, 0.15);
+        }
+        .glass-card {
+            background: linear-gradient(135deg, rgba(25, 25, 32, 0.8) 0%, rgba(14, 14, 18, 0.9) 100%);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .glass-card:hover {
+            border-color: rgba(255, 30, 56, 0.4);
+            box-shadow: 0 10px 30px -10px rgba(255, 30, 56, 0.3);
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #080808;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #262630;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ff1e38;
+        }
+        .glow-bg {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(255, 30, 56, 0.15) 0%, rgba(0,0,0,0) 70%);
+            filter: blur(80px);
+            z-index: -1;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-brandRed selection:text-white">
+
+    <!-- Ambient Glow Backgrounds -->
+    <div class="glow-bg top-0 left-1/4 pointer-events-none"></div>
+    <div class="glow-bg top-[40%] right-[-10%] pointer-events-none"></div>
+    <div class="glow-bg bottom-10 left-[10%] pointer-events-none"></div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none">
+        <div class="glass text-white px-6 py-4 rounded-xl shadow-neon flex items-center space-x-3 border-l-4 border-brandRed">
+            <i data-lucide="check-circle" class="w-6 h-6 text-brandRed"></i>
+            <div>
+                <p id="toast-title" class="font-bold text-sm">¡Acción exitosa!</p>
+                <p id="toast-desc" class="text-xs text-gray-400">El producto se ha añadido al carrito.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- HEADER & NAVBAR -->
+    <header class="sticky top-0 z-40 w-full glass border-b border-white/5 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            
+            <!-- Logo -->
+            <a href="#" class="flex items-center space-x-3 group">
+                <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-brandRed to-black flex items-center justify-center shadow-neon group-hover:scale-105 transition-transform">
+                    <i data-lucide="zap" class="w-6 h-6 text-white fill-white"></i>
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-xl font-black tracking-wider text-white">SERVI<span class="text-brandRed">NETWORK</span></span>
+                    <span class="text-[10px] tracking-widest text-gray-400 font-semibold uppercase -mt-1">Streaming Premium</span>
+                </div>
+            </a>
+
+            <!-- Desktop Navigation -->
+            <nav class="hidden md:flex items-center space-x-8">
+                <a href="#catalogo" class="text-sm font-medium text-gray-300 hover:text-brandRed transition-colors">Catálogo</a>
+                <a href="#combos" class="text-sm font-medium text-gray-300 hover:text-brandRed transition-colors flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-brandRed animate-pulse"></span> Combos VIP
+                </a>
+                <a href="#metodos-pago" class="text-sm font-medium text-gray-300 hover:text-brandRed transition-colors">Métodos de Pago</a>
+                <a href="#garantia" class="text-sm font-medium text-gray-300 hover:text-brandRed transition-colors">Garantía 24/7</a>
+            </nav>
+
+            <!-- Actions (Search, Cart, User) -->
+            <div class="flex items-center space-x-4">
+                
+                <!-- Search bar trigger / input -->
+                <div class="hidden lg:flex items-center relative">
+                    <input type="text" id="searchInput" placeholder="Buscar plataforma..." class="bg-black/40 border border-white/10 rounded-full py-2 pl-4 pr-10 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-brandRed focus:ring-1 focus:ring-brandRed w-48 transition-all">
+                    <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute right-3 pointer-events-none"></i>
+                </div>
+
+                <!-- Cart Button -->
+                <button onclick="toggleCartModal()" class="relative p-2.5 rounded-xl bg-cardBg border border-white/10 hover:border-brandRed/50 text-gray-300 hover:text-white transition-all group">
+                    <i data-lucide="shopping-cart" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
+                    <span id="cart-badge" class="absolute -top-1.5 -right-1.5 bg-brandRed text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center shadow-neon scale-0 transition-transform duration-300">0</span>
+                </button>
+
+                <!-- Auth Button -->
+                <button onclick="openAuthModal()" class="hidden sm:flex items-center space-x-2 bg-gradient-to-r from-brandRed to-rose-700 hover:from-rose-600 hover:to-brandRed text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-neon transition-all hover:scale-105">
+                    <i data-lucide="user" class="w-4 h-4"></i>
+                    <span>Acceder</span>
+                </button>
+
+                <!-- Mobile Menu Toggle -->
+                <button onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-xl bg-cardBg border border-white/10 text-gray-300 hover:text-white">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+
+            </div>
+        </div>
+
+        <!-- Mobile Menu Dropdown -->
+        <div id="mobileMenu" class="hidden md:hidden glass border-b border-white/10 px-6 py-4 space-y-3">
+            <a href="#catalogo" onclick="toggleMobileMenu()" class="block text-sm font-medium text-gray-300 hover:text-brandRed py-1">Catálogo</a>
+            <a href="#combos" onclick="toggleMobileMenu()" class="block text-sm font-medium text-gray-300 hover:text-brandRed py-1">Combos VIP</a>
+            <a href="#metodos-pago" onclick="toggleMobileMenu()" class="block text-sm font-medium text-gray-300 hover:text-brandRed py-1">Métodos de Pago</a>
+            <a href="#garantia" onclick="toggleMobileMenu()" class="block text-sm font-medium text-gray-300 hover:text-brandRed py-1">Garantía 24/7</a>
+            <div class="pt-2 border-t border-white/15 flex items-center justify-between">
+                <button onclick="openAuthModal(); toggleMobileMenu();" class="w-full bg-brandRed text-white text-xs font-bold py-2.5 rounded-xl shadow-neon">Iniciar Sesión</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section class="relative pt-16 pb-24 md:pt-24 md:pb-32 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                
+                <!-- Left text -->
+                <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
+                    <div class="inline-flex items-center space-x-2 bg-brandRed/10 border border-brandRed/30 px-4 py-2 rounded-full text-brandRedLight text-xs font-semibold shadow-sm">
+                        <i data-lucide="shield-check" class="w-4 h-4"></i>
+                        <span>Plataformas 100% Oficiales y Garantizadas</span>
+                    </div>
+                    
+                    <h1 class="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-none text-white">
+                        TU ENTRETENIMIENTO <br>
+                        <span class="bg-gradient-to-r from-brandRed via-rose-500 to-amber-500 bg-clip-text text-transparent">AL MEJOR PRECIO</span>
+                    </h1>
+                    
+                    <p class="text-gray-400 text-base sm:text-lg max-w-2xl mx-auto lg:mx-0">
+                        Disfruta de Netflix, Disney+, Max, Spotify, YouTube Premium y mucho más con entrega inmediata automática 24/7, perfiles seguros y garantía total por todo el mes.
+                    </p>
+
+                    <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-4">
+                        <a href="#catalogo" class="w-full sm:w-auto bg-gradient-to-r from-brandRed to-rose-700 hover:from-rose-600 hover:to-brandRed text-white font-bold px-8 py-4 rounded-xl shadow-neon hover:scale-105 transition-all flex items-center justify-center space-x-3 text-sm">
+                            <i data-lucide="grid" class="w-5 h-5"></i>
+                            <span>Ver Catálogo Completo</span>
+                        </a>
+                        <a href="#combos" class="w-full sm:w-auto glass hover:bg-white/5 text-white font-bold px-8 py-4 rounded-xl transition-all flex items-center justify-center space-x-3 text-sm border border-white/10">
+                            <i data-lucide="tag" class="w-5 h-5 text-brandRed"></i>
+                            <span>Ver Combos VIP</span>
+                        </a>
+                    </div>
+
+                    <!-- Trust Stats -->
+                    <div class="grid grid-cols-3 gap-4 pt-8 border-t border-white/10 max-w-lg mx-auto lg:mx-0">
+                        <div class="text-center lg:text-left">
+                            <p class="text-2xl sm:text-3xl font-black text-white">+1,500</p>
+                            <p class="text-xs text-gray-400">Clientes Felices</p>
+                        </div>
+                        <div class="text-center lg:text-left">
+                            <p class="text-2xl sm:text-3xl font-black text-white">24/7</p>
+                            <p class="text-xs text-gray-400">Entrega Automática</p>
+                        </div>
+                        <div class="text-center lg:text-left">
+                            <p class="text-2xl sm:text-3xl font-black text-white">100%</p>
+                            <p class="text-xs text-gray-400">Garantía Activa</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Hero Banner / Floating Card Graphic -->
+                <div class="lg:col-span-5 relative flex justify-center">
+                    <div class="relative w-full max-w-md">
+                        <!-- Glow behind card -->
+                        <div class="absolute -inset-1 bg-gradient-to-r from-brandRed to-purple-600 rounded-3xl blur-xl opacity-40 animate-pulse"></div>
+                        
+                        <!-- Main Card -->
+                        <div class="relative glass-card p-6 sm:p-8 rounded-3xl border border-white/10 shadow-2xl space-y-6">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-12 h-12 rounded-2xl bg-brandRed flex items-center justify-center shadow-neon">
+                                        <i data-lucide="tv" class="w-6 h-6 text-white"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-bold text-lg text-white">Combo Mega Ultra</h3>
+                                        <p class="text-xs text-brandRedLight font-semibold">Netflix + Disney + Max + Spotify</p>
+                                    </div>
+                                </div>
+                                <span class="bg-brandRed/20 text-brandRed border border-brandRed/30 text-xs font-bold px-3 py-1 rounded-full">-40% OFF</span>
+                            </div>
+
+                            <div class="space-y-3 py-2">
+                                <div class="flex items-center justify-between text-xs text-gray-300 bg-black/30 p-3 rounded-xl">
+                                    <span class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-brandRed"></i> Pantalla Netflix UHD 4K</span>
+                                    <span class="text-green-400 font-bold">Activo</span>
+                                </div>
+                                <div class="flex items-center justify-between text-xs text-gray-300 bg-black/30 p-3 rounded-xl">
+                                    <span class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-brandRed"></i> Disney+ & Star+ Sin Anuncios</span>
+                                    <span class="text-green-400 font-bold">Activo</span>
+                                </div>
+                                <div class="flex items-center justify-between text-xs text-gray-300 bg-black/30 p-3 rounded-xl">
+                                    <span class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-brandRed"></i> Spotify Plan Familiar</span>
+                                    <span class="text-green-400 font-bold">Activo</span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between pt-2">
+                                <div>
+                                    <span class="text-xs text-gray-500 line-through">$24.99 USD</span>
+                                    <div class="text-2xl font-black text-white">$11.99 <span class="text-xs font-normal text-gray-400">/ mes</span></div>
+                                </div>
+                                <button onclick="quickBuyCombo('Combo Mega Ultra', 11.99)" class="bg-brandRed hover:bg-brandRedHover text-white font-bold px-5 py-3 rounded-xl shadow-neon text-xs transition-all hover:scale-105 flex items-center gap-2">
+                                    <i data-lucide="zap" class="w-4 h-4"></i> Comprar Ahora
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Floating secondary badge -->
+                        <div class="absolute -bottom-6 -left-6 glass-card p-4 rounded-2xl border border-white/10 hidden sm:flex items-center space-x-3 shadow-xl">
+                            <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                                <i data-lucide="shield-check" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-white">Entrega Inmediata</p>
+                                <p class="text-[10px] text-gray-400">Recibe tus datos al instante</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- COMBOS VIP SECTION -->
+    <section id="combos" class="py-16 relative bg-gradient-to-b from-transparent via-[#0e0e12] to-transparent">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto mb-12 space-y-3">
+                <div class="inline-flex items-center space-x-2 bg-brandRed/10 border border-brandRed/30 px-3 py-1 rounded-full text-brandRedLight text-xs font-bold uppercase tracking-wider">
+                    <i data-lucide="flame" class="w-3.5 h-3.5"></i> Ofertas Especiales
+                </div>
+                <h2 class="text-3xl sm:text-4xl font-black text-white tracking-tight">Combos VIP Más Vendidos</h2>
+                <p class="text-sm text-gray-400">Ahorra hasta un 50% combinando tus plataformas favoritas con nuestra garantía total incluida.</p>
+            </div>
+
+            <!-- Combos Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8" id="combos-grid">
+                <!-- Combo 1 -->
+                <div class="glass-card rounded-3xl p-6 sm:p-8 flex flex-col justify-between relative border border-white/10 hover:border-brandRed/50 transition-all group">
+                    <div class="absolute top-6 right-6 bg-brandRed/20 text-brandRed border border-brandRed/30 text-xs font-bold px-3 py-1 rounded-full">AHORRO 40%</div>
+                    <div>
+                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-red-600 to-black flex items-center justify-center text-white mb-6 shadow-neon group-hover:scale-110 transition-transform">
+                            <i data-lucide="film" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-xl font-black text-white mb-2">Combo Dúo Cine</h3>
+                        <p class="text-xs text-gray-400 mb-6">Netflix (Pantalla Completa) + Max (HBO) Estándar en Ultra HD.</p>
+                        
+                        <ul class="space-y-3 text-xs text-gray-300 mb-8">
+                            <li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-brandRed"></i> Netflix perfil privado</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-brandRed"></i> Max cuenta completa o perfil</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-brandRed"></i> Garantía 30 Días</li>
+                        </ul>
+                    </div>
+
+                    <div class="pt-6 border-t border-white/10 flex items-center justify-between">
+                        <div>
+                            <span class="text-xs text-gray-500 line-through">$14.99</span>
+                            <div class="text-2xl font-black text-white">$8.99 <span class="text-xs font-normal text-gray-400">/ mes</span></div>
+                        </div>
+                        <button onclick="addToCart('Combo Dúo Cine (Netflix + Max)', 8.99, 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=100&auto=format&fit=crop&q=60')" class="bg-brandRed hover:bg-brandRedHover text-white text-xs font-bold px-5 py-3 rounded-xl shadow-neon transition-all hover:scale-105 flex items-center gap-2">
+                            <i data-lucide="shopping-cart" class="w-4 h-4"></i> Añadir
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Combo 2 (Featured) -->
+                <div class="glass-card rounded-3xl p-6 sm:p-8 flex flex-col justify-between relative border-2 border-brandRed shadow-neon group">
+                    <div class="absolute -top-3.5 left-1/2 transform -translate-x-1/2 bg-brandRed text-white text-[10px] uppercase font-black px-4 py-1 rounded-full tracking-widest shadow-neon">Más Popular</div>
+                    <div class="absolute top-6 right-6 bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-bold px-3 py-1 rounded-full">AHORRO 50%</div>
+                    <div>
+                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-brandRed via-rose-600 to-amber-600 flex items-center justify-center text-white mb-6 shadow-neon group-hover:scale-110 transition-transform">
+                            <i data-lucide="zap" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-xl font-black text-white mb-2">Combo Full Streaming</h3>
+                        <p class="text-xs text-gray-400 mb-6">Netflix + Disney+ + Max + Prime Video + Spotify en un solo paquete.</p>
+                        
+                        <ul class="space-y-3 text-xs text-gray-300 mb-8">
+                            <li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-brandRed"></i> 5 Plataformas Principales</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-brandRed"></i> Perfiles 4K Ultra HD</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-brandRed"></i> Soporte VIP Prioritario 24/7</li>
+                        </ul>
+                    </div>
+
+                    <div class="pt-6 border-t border-white/10 flex items-center justify-between">
+                        <div>
+                            <span class="text-xs text-gray-500 line-through">$35.00</span>
+                            <div class="text-2xl font-black text-white">$15.99 <span class="text-xs font-normal text-gray-400">/ mes</span></div>
+                        </div>
+                        <button onclick="addToCart('Combo Full Streaming (5 Apps)', 15.99, 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=100&auto=format&fit=crop&q=60')" class="bg-gradient-to-r from-brandRed to-rose-700 hover:from-rose-600 hover:to-brandRed text-white text-xs font-bold px-5 py-3 rounded-xl shadow-neon transition-all hover:scale-105 flex items-center gap-2">
+                            <i data-lucide="shopping-cart" class="w-4 h-4"></i> Añadir
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Combo 3 -->
+                <div class="glass-card rounded-3xl p-6 sm:p-8 flex flex-col justify-between relative border border-white/10 hover:border-brandRed/50 transition-all group">
+                    <div class="absolute top-6 right-6 bg-brandRed/20 text-brandRed border border-brandRed/30 text-xs font-bold px-3 py-1 rounded-full">AHORRO 35%</div>
+                    <div>
+                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-600 to-brandRed flex items-center justify-center text-white mb-6 shadow-neon group-hover:scale-110 transition-transform">
+                            <i data-lucide="music" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-xl font-black text-white mb-2">Combo Música & Kids</h3>
+                        <p class="text-xs text-gray-400 mb-6">Spotify Familiar (Tu propio correo) + Disney+ Premium.</p>
+                        
+                        <ul class="space-y-3 text-xs text-gray-300 mb-8">
+                            <li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-brandRed"></i> Spotify con tu cuenta personal</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-brandRed"></i> Disney+ pantalla Ultra HD</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-brandRed"></i> Garantía extendida</li>
+                        </ul>
+                    </div>
+
+                    <div class="pt-6 border-t border-white/10 flex items-center justify-between">
+                        <div>
+                            <span class="text-xs text-gray-500 line-through">$13.99</span>
+                            <div class="text-2xl font-black text-white">$7.99 <span class="text-xs font-normal text-gray-400">/ mes</span></div>
+                        </div>
+                        <button onclick="addToCart('Combo Música & Kids (Spotify + Disney)', 7.99, 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=100&auto=format&fit=crop&q=60')" class="bg-brandRed hover:bg-brandRedHover text-white text-xs font-bold px-5 py-3 rounded-xl shadow-neon transition-all hover:scale-105 flex items-center gap-2">
+                            <i data-lucide="shopping-cart" class="w-4 h-4"></i> Añadir
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CATALOGO SECTION -->
+    <section id="catalogo" class="py-16 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
+                <div>
+                    <div class="inline-flex items-center space-x-2 bg-brandRed/10 border border-brandRed/30 px-3 py-1 rounded-full text-brandRedLight text-xs font-bold uppercase tracking-wider mb-2">
+                        <i data-lucide="grid" class="w-3.5 h-3.5"></i> Tienda Online
+                    </div>
+                    <h2 class="text-3xl sm:text-4xl font-black text-white tracking-tight">Catálogo de Productos</h2>
+                    <p class="text-sm text-gray-400 mt-1">Elige tu plataforma preferida y obtén los datos de acceso en segundos.</p>
+                </div>
+
+                <!-- Category Filters Tabs -->
+                <div class="flex flex-wrap gap-2" id="category-filters">
+                    <button onclick="filterProducts('all')" class="cat-btn bg-brandRed text-white text-xs font-bold px-4 py-2 rounded-xl transition-all shadow-neon">Todos</button>
+                    <button onclick="filterProducts('streaming')" class="cat-btn bg-cardBg hover:bg-cardHover text-gray-300 border border-white/10 text-xs font-bold px-4 py-2 rounded-xl transition-all">Streaming</button>
+                    <button onclick="filterProducts('musica')" class="cat-btn bg-cardBg hover:bg-cardHover text-gray-300 border border-white/10 text-xs font-bold px-4 py-2 rounded-xl transition-all">Música</button>
+                    <button onclick="filterProducts('anime')" class="cat-btn bg-cardBg hover:bg-cardHover text-gray-300 border border-white/10 text-xs font-bold px-4 py-2 rounded-xl transition-all">Anime / Deportes</button>
+                </div>
+            </div>
+
+            <!-- Products Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" id="products-grid">
+                <!-- Product 1 -->
+                <div class="glass-card rounded-3xl p-5 flex flex-col justify-between border border-white/10 hover:border-brandRed/50 transition-all group product-card" data-category="streaming" data-name="netflix ultra hd pantalla">
+                    <div>
+                        <div class="relative rounded-2xl overflow-hidden aspect-video mb-4 bg-black/50 border border-white/5">
+                            <img src="https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=500&auto=format&fit=crop&q=60" alt="Netflix" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80" onerror="this.src='https://placehold.co/400x225/141414/ff1e38?text=Netflix+4K'">
+                            <div class="absolute top-3 left-3 bg-brandRed text-white text-[10px] font-black px-2.5 py-1 rounded-lg uppercase tracking-wider shadow">Más Vendido</div>
+                            <div class="absolute bottom-3 right-3 glass px-2.5 py-1 rounded-lg text-[10px] font-bold text-white flex items-center gap-1">
+                                <i data-lucide="zap" class="w-3 h-3 text-brandRed"></i> Instantáneo
+                            </div>
+                        </div>
+                        <h3 class="font-bold text-base text-white mb-1 group-hover:text-brandRed transition-colors">Netflix Ultra HD 4K</h3>
+                        <p class="text-xs text-gray-400 mb-4 line-clamp-2">1 Pantalla en perfil privado con PIN de seguridad y calidad máxima 4K HDR.</p>
+                    </div>
+                    <div>
+                        <div class="flex items-center justify-between mb-4 pt-3 border-t border-white/10">
+                            <div>
+                                <span class="text-[10px] text-gray-500 block">Duración: 30 Días</span>
+                                <span class="text-lg font-black text-white">$4.99</span>
+                            </div>
+                            <span class="text-xs text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20 font-semibold">Stock Disponible</span>
+                        </div>
+                        <button onclick="addToCart('Netflix Ultra HD 4K (1 Mes)', 4.99, 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=100&auto=format&fit=crop&q=60')" class="w-full bg-cardBg hover:bg-brandRed text-white text-xs font-bold py-3 rounded-xl border border-white/10 hover:border-brandRed transition-all flex items-center justify-center gap-2 group-hover:shadow-neon">
+                            <i data-lucide="shopping-cart" class="w-4 h-4"></i> Añadir al Carrito
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Product 2 -->
+                <div class="glass-card rounded-3xl p-5 flex flex-col justify-between border border-white/10 hover:border-brandRed/50 transition-all group product-card" data-category="streaming" data-name="disney plus premium">
+                    <div>
+                        <div class="relative rounded-2xl overflow-hidden aspect-video mb-4 bg-black/50 border border-white/5">
+                            <img src="https://images.unsplash.com/photo-1616469829941-c7200edec809?w=500&auto=format&fit=crop&q=60" alt="Disney+" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80" onerror="this.src='https://placehold.co/400x225/141414/ff1e38?text=Disney+'">
+                            <div class="absolute top-3 left-3 bg-blue-600 text-white text-[10px] font-black px-2.5 py-1 rounded-lg uppercase tracking-wider shadow">Premium</div>
+                        </div>
+                        <h3 class="font-bold text-base text-white mb-1 group-hover:text-brandRed transition-colors">Disney+ Premium</h3>
+                        <p class="text-xs text-gray-400 mb-4 line-clamp-2">Cuenta completa o perfil independiente con estrenos exclusivos de Marvel y Star Wars.</p>
+                    </div>
+                    <div>
+                        <div class="flex items-center justify-between mb-4 pt-3 border-t border-white/10">
+                            <div>
+                                <span class="text-[10px] text-gray-500 block">Duración: 30 Días</span>
+                                <span class="text-lg font-black text-white">$3.99</span>
+                            </div>
+                            <span class="text-xs text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20 font-semibold">Stock Disponible</span>
+                        </div>
+                        <button onclick="addToCart('Disney+ Premium (1 Mes)', 3.99, 'https://images.unsplash.com/photo-1616469829941-c7200edec809?w=100&auto=format&fit=crop&q=60')" class="w-full bg-cardBg hover:bg-brandRed text-white text-xs font-bold py-3 rounded-xl border border-white/10 hover:border-brandRed transition-all flex items-center justify-center gap-2 group-hover:shadow-neon">
+                            <i data-lucide="shopping-cart" class="w-4 h-4"></i> Añadir al Carrito
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Product 3 -->
+                <div class="glass-card rounded-3xl p-5 flex flex-col justify-between border border-white/10 hover:border-brandRed/50 transition-all group product-card" data-category="streaming" data-name="max hbo max">
+                    <div>
+                        <div class="relative rounded-2xl overflow-hidden aspect-video mb-4 bg-black/50 border border-white/5">
+                            <img src="https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=500&auto=format&fit=crop&q=60" alt="Max" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80" onerror="this.src='https://placehold.co/400x225/141414/ff1e38?text=Max+HBO'">
+                            <div class="absolute top-3 left-3 bg-purple-600 text-white text-[10px] font-black px-2.5 py-1 rounded-lg uppercase tracking-wider shadow">Estreno</div>
+                        </div>
+                        <h3 class="font-bold text-base text-white mb-1 group-hover:text-brandRed transition-colors">Max (HBO) Estándar</h3>
+                        <p class="text-xs text-gray-400 mb-4 line-clamp-2">Disfruta de películas de Warner Bros, HBO Originales, DC y contenido en alta definición.</p>
+                    </div>
+                    <div>
+                        <div class="flex items-center justify-between mb-4 pt-3 border-t border-white/10">
+                            <div>
+                                <span class="text-[10px] text-gray-500 block">Duración: 30 Días</span>
+                                <span class="text-lg font-black text-white">$3.49</span>
+                            </div>
+                            <span class="text-xs text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20 font-semibold">Stock Disponible</span>
+                        </div>
+                        <button onclick="addToCart('Max (HBO) Estándar (1 Mes)', 3.49, 'https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=100&auto=format&fit=crop&q=60')" class="w-full bg-cardBg hover:bg-brandRed text-white text-xs font-bold py-3 rounded-xl border border-white/10 hover:border-brandRed transition-all flex items-center justify-center gap-2 group-hover:shadow-neon">
+                            <i data-lucide="shopping-cart" class="w-4 h-4"></i> Añadir al Carrito
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Product 4 -->
+                <div class="glass-card rounded-3xl p-5 flex flex-col justify-between border border-white/10 hover:border-brandRed/50 transition-all group product-card" data-category="musica" data-name="spotify premium">
+                    <div>
+                        <div class="relative rounded-2xl overflow-hidden aspect-video mb-4 bg-black/50 border border-white/5">
+                            <img src="https://images.unsplash.com/photo-1614680376593-902f749f7ffc?w=500&auto=format&fit=crop&q=60" alt="Spotify" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80" onerror="this.src='https://placehold.co/400x225/141414/ff1e38?text=Spotify'">
+                            <div class="absolute top-3 left-3 bg-emerald-600 text-white text-[10px] font-black px-2.5 py-1 rounded-lg uppercase tracking-wider shadow">Tu Correo</div>
+                        </div>
+                        <h3 class="font-bold text-base text-white mb-1 group-hover:text-brandRed transition-colors">Spotify Premium Individual</h3>
+                        <p class="text-xs text-gray-400 mb-4 line-clamp-2">Activación directo en tu cuenta personal existente. Sin anuncios, música ilimitada.</p>
+                    </div>
+                    <div>
+                        <div class="flex items-center justify-between mb-4 pt-3 border-t border-white/10">
+                            <div>
+                                <span class="text-[10px] text-gray-500 block">Duración: 30 Días</span>
+                                <span class="text-lg font-black text-white">$3.99</span>
+                            </div>
+                            <span class="text-xs text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20 font-semibold">Stock Disponible</span>
+                        </div>
+                        <button onclick="addToCart('Spotify Premium Individual (1 Mes)', 3.99, 'https://images.unsplash.com/photo-1614680376593-902f749f7ffc?w=100&auto=format&fit=crop&q=60')" class="w-full bg-cardBg hover:bg-brandRed text-white text-xs font-bold py-3 rounded-xl border border-white/10 hover:border-brandRed transition-all flex items-center justify-center gap-2 group-hover:shadow-neon">
+                            <i data-lucide="shopping-cart" class="w-4 h-4"></i> Añadir al Carrito
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Product 5 -->
+                <div class="glass-card rounded-3xl p-5 flex flex-col justify-between border border-white/10 hover:border-brandRed/50 transition-all group product-card" data-category="streaming" data-name="amazon prime video">
+                    <div>
+                        <div class="relative rounded-2xl overflow-hidden aspect-video mb-4 bg-black/50 border border-white/5">
+                            <img src="https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=500&auto=format&fit=crop&q=60" alt="Prime Video" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80" onerror="this.src='https://placehold.co/400x225/141414/ff1e38?text=Prime+Video'">
+                            <div class="absolute top-3 left-3 bg-sky-600 text-white text-[10px] font-black px-2.5 py-1 rounded-lg uppercase tracking-wider shadow">Full HD</div>
+                        </div>
+                        <h3 class="font-bold text-base text-white mb-1 group-hover:text-brandRed transition-colors">Amazon Prime Video</h3>
+                        <p class="text-xs text-gray-400 mb-4 line-clamp-2">Cuenta completa o perfil privado con acceso a The Boys, Fallout y películas recientes.</p>
+                    </div>
+                    <div>
+                        <div class="flex items-center justify-between mb-4 pt-3 border-t border-white/10">
+                            <div>
+                                <span class="text-[10px] text-gray-500 block">Duración: 30 Días</span>
+                                <span class="text-lg font-black text-white">$2.99</span>
+                            </div>
+                            <span class="text-xs text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20 font-semibold">Stock Disponible</span>
+                        </div>
+                        <button onclick="addToCart('Amazon Prime Video (1 Mes)', 2.99, 'https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=100&auto=format&fit=crop&q=60')" class="w-full bg-cardBg hover:bg-brandRed text-white text-xs font-bold py-3 rounded-xl border border-white/10 hover:border-brandRed transition-all flex items-center justify-center gap-2 group-hover:shadow-neon">
+                            <i data-lucide="shopping-cart" class="w-4 h-4"></i> Añadir al Carrito
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Product 6 -->
+                <div class="glass-card rounded-3xl p-5 flex flex-col justify-between border border-white/10 hover:border-brandRed/50 transition-all group product-card" data-category="streaming" data-name="youtube premium">
+                    <div>
+                        <div class="relative rounded-2xl overflow-hidden aspect-video mb-4 bg-black/50 border border-white/5">
+                            <img src="https://images.unsplash.com/photo-1611162617474-5baf1e272b53?w=500&auto=format&fit=crop&q=60" alt="YouTube" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80" onerror="this.src='https://placehold.co/400x225/141414/ff1e38?text=YouTube+Premium'">
+                            <div class="absolute top-3 left-3 bg-red-600 text-white text-[10px] font-black px-2.5 py-1 rounded-lg uppercase tracking-wider shadow">Sin Anuncios</div>
+                        </div>
+                        <h3 class="font-bold text-base text-white mb-1 group-hover:text-brandRed transition-colors">YouTube Premium Familiar</h3>
+                        <p class="text-xs text-gray-400 mb-4 line-clamp-2">Videos sin anuncios, reproducción en segundo plano y YouTube Music incluido en tu correo.</p>
+                    </div>
+                    <div>
+                        <div class="flex items-center justify-between mb-4 pt-3 border-t border-white/10">
+                            <div>
+                                <span class="text-[10px] text-gray-500 block">Duración: 30 Días</span>
+                                <span class="text-lg font-black text-white">$2.99</span>
+                            </div>
+                            <span class="text-xs text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20 font-semibold">Stock Disponible</span>
+                        </div>
+                        <button onclick="addToCart('YouTube Premium (1 Mes)', 2.99, 'https://images.unsplash.com/photo-1611162617474-5baf1e272b53?w=100&auto=format&fit=crop&q=60')" class="w-full bg-cardBg hover:bg-brandRed text-white text-xs font-bold py-3 rounded-xl border border-white/10 hover:border-brandRed transition-all flex items-center justify-center gap-2 group-hover:shadow-neon">
+                            <i data-lucide="shopping-cart" class="w-4 h-4"></i> Añadir al Carrito
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Product 7 -->
+                <div class="glass-card rounded-3xl p-5 flex flex-col justify-between border border-white/10 hover:border-brandRed/50 transition-all group product-card" data-category="anime" data-name="crunchyroll mega fan">
+                    <div>
+                        <div class="relative rounded-2xl overflow-hidden aspect-video mb-4 bg-black/50 border border-white/5">
+                            <img src="https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=500&auto=format&fit=crop&q=60" alt="Crunchyroll" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80" onerror="this.src='https://placehold.co/400x225/141414/ff1e38?text=Crunchyroll'">
+                            <div class="absolute top-3 left-3 bg-amber-600 text-white text-[10px] font-black px-2.5 py-1 rounded-lg uppercase tracking-wider shadow">Anime HD</div>
+                        </div>
+                        <h3 class="font-bold text-base text-white mb-1 group-hover:text-brandRed transition-colors">Crunchyroll Mega Fan</h3>
+                        <p class="text-xs text-gray-400 mb-4 line-clamp-2">Anime en simultáneo con Japón, sin publicidad y visualización offline disponible.</p>
+                    </div>
+                    <div>
+                        <div class="flex items-center justify-between mb-4 pt-3 border-t border-white/10">
+                            <div>
+                                <span class="text-[10px] text-gray-500 block">Duración: 30 Días</span>
+                                <span class="text-lg font-black text-white">$2.49</span>
+                            </div>
+                            <span class="text-xs text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20 font-semibold">Stock Disponible</span>
+                        </div>
+                        <button onclick="addToCart('Crunchyroll Mega Fan (1 Mes)', 2.49, 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=100&auto=format&fit=crop&q=60')" class="w-full bg-cardBg hover:bg-brandRed text-white text-xs font-bold py-3 rounded-xl border border-white/10 hover:border-brandRed transition-all flex items-center justify-center gap-2 group-hover:shadow-neon">
+                            <i data-lucide="shopping-cart" class="w-4 h-4"></i> Añadir al Carrito
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Product 8 -->
+                <div class="glass-card rounded-3xl p-5 flex flex-col justify-between border border-white/10 hover:border-brandRed/50 transition-all group product-card" data-category="streaming" data-name="paramount plus">
+                    <div>
+                        <div class="relative rounded-2xl overflow-hidden aspect-video mb-4 bg-black/50 border border-white/5">
+                            <img src="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=500&auto=format&fit=crop&q=60" alt="Paramount+" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80" onerror="this.src='https://placehold.co/400x225/141414/ff1e38?text=Paramount+'">
+                            <div class="absolute top-3 left-3 bg-blue-700 text-white text-[10px] font-black px-2.5 py-1 rounded-lg uppercase tracking-wider shadow">Exclusivo</div>
+                        </div>
+                        <h3 class="font-bold text-base text-white mb-1 group-hover:text-brandRed transition-colors">Paramount+</h3>
+                        <p class="text-xs text-gray-400 mb-4 line-clamp-2">Series originales, películas taquilleras y contenido deportivo en vivo.</p>
+                    </div>
+                    <div>
+                        <div class="flex items-center justify-between mb-4 pt-3 border-t border-white/10">
+                            <div>
+                                <span class="text-[10px] text-gray-500 block">Duración: 30 Días</span>
+                                <span class="text-lg font-black text-white">$2.99</span>
+                            </div>
+                            <span class="text-xs text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20 font-semibold">Stock Disponible</span>
+                        </div>
+                        <button onclick="addToCart('Paramount+ (1 Mes)', 2.99, 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=100&auto=format&fit=crop&q=60')" class="w-full bg-cardBg hover:bg-brandRed text-white text-xs font-bold py-3 rounded-xl border border-white/10 hover:border-brandRed transition-all flex items-center justify-center gap-2 group-hover:shadow-neon">
+                            <i data-lucide="shopping-cart" class="w-4 h-4"></i> Añadir al Carrito
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- METODOS DE PAGO SECTION -->
+    <section id="metodos-pago" class="py-16 bg-[#0a0a0e] border-y border-white/5 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto mb-12 space-y-3">
+                <div class="inline-flex items-center space-x-2 bg-brandRed/10 border border-brandRed/30 px-3 py-1 rounded-full text-brandRedLight text-xs font-bold uppercase tracking-wider">
+                    <i data-lucide="credit-card" class="w-3.5 h-3.5"></i> Pagos Seguros
+                </div>
+                <h2 class="text-3xl sm:text-4xl font-black text-white tracking-tight">Métodos de Pago Disponibles</h2>
+                <p class="text-sm text-gray-400">Aceptamos múltiples pasarelas y métodos locales e internacionales con validación automatizada.</p>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Payment 1 -->
+                <div class="glass-card p-6 rounded-3xl text-center border border-white/10 hover:border-brandRed/50 transition-all space-y-3">
+                    <div class="w-14 h-14 rounded-2xl bg-amber-500/20 text-amber-400 mx-auto flex items-center justify-center text-xl font-black border border-amber-500/30 shadow-sm">
+                        <i data-lucide="coins" class="w-7 h-7"></i>
+                    </div>
+                    <h3 class="font-bold text-white text-sm">Binance Pay (USDT)</h3>
+                    <p class="text-xs text-gray-400">Pago instantáneo sin comisiones y con acreditación automática inmediata.</p>
+                </div>
+
+                <!-- Payment 2 -->
+                <div class="glass-card p-6 rounded-3xl text-center border border-white/10 hover:border-brandRed/50 transition-all space-y-3">
+                    <div class="w-14 h-14 rounded-2xl bg-brandRed/20 text-brandRed mx-auto flex items-center justify-center text-xl font-black border border-brandRed/30 shadow-sm">
+                        <i data-lucide="smartphone" class="w-7 h-7"></i>
+                    </div>
+                    <h3 class="font-bold text-white text-sm">Pago Móvil / Zelle</h3>
+                    <p class="text-xs text-gray-400">Transferencias bancarias locales y Zelle directo con reporte automático.</p>
+                </div>
+
+                <!-- Payment 3 -->
+                <div class="glass-card p-6 rounded-3xl text-center border border-white/10 hover:border-brandRed/50 transition-all space-y-3">
+                    <div class="w-14 h-14 rounded-2xl bg-blue-500/20 text-blue-400 mx-auto flex items-center justify-center text-xl font-black border border-blue-500/30 shadow-sm">
+                        <i data-lucide="credit-card" class="w-7 h-7"></i>
+                    </div>
+                    <h3 class="font-bold text-white text-sm">Tarjetas de Débito/Crédito</h3>
+                    <p class="text-xs text-gray-400">Visa, Mastercard y tarjetas internacionales procesadas de forma segura.</p>
+                </div>
+
+                <!-- Payment 4 -->
+                <div class="glass-card p-6 rounded-3xl text-center border border-white/10 hover:border-brandRed/50 transition-all space-y-3">
+                    <div class="w-14 h-14 rounded-2xl bg-purple-500/20 text-purple-400 mx-auto flex items-center justify-center text-xl font-black border border-purple-500/30 shadow-sm">
+                        <i data-lucide="wallet" class="w-7 h-7"></i>
+                    </div>
+                    <h3 class="font-bold text-white text-sm">Criptomonedas</h3>
+                    <p class="text-xs text-gray-400">Bitcoin, USDT, USDC y otras altcoins mediante pasarela segura.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- GARANTIA & SOPORTE -->
+    <section id="garantia" class="py-16 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="glass-card rounded-3xl p-8 sm:p-12 border border-white/10 relative overflow-hidden">
+                <div class="absolute -right-20 -bottom-20 w-96 h-96 bg-brandRed/10 rounded-full blur-3xl pointer-events-none"></div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+                    <div class="lg:col-span-8 space-y-4">
+                        <div class="inline-flex items-center space-x-2 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1 rounded-full text-emerald-400 text-xs font-bold uppercase tracking-wider">
+                            <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Respaldo Garantizado
+                        </div>
+                        <h2 class="text-2xl sm:text-4xl font-black text-white">¿Por qué confiar en ServiNetwork?</h2>
+                        <p class="text-sm text-gray-300 leading-relaxed">
+                            Contamos con más de 3 años en el mercado ofreciendo estabilidad, soporte técnico por WhatsApp y Telegram 24/7, y reemplazo inmediato ante cualquier inconveniente con tus credenciales.
+                        </p>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
+                            <div class="flex items-center space-x-3 bg-black/40 p-3 rounded-xl border border-white/5">
+                                <i data-lucide="check-circle" class="w-5 h-5 text-brandRed flex-shrink-0"></i>
+                                <span class="text-xs font-semibold text-gray-200">Garantía de reposición</span>
+                            </div>
+                            <div class="flex items-center space-x-3 bg-black/40 p-3 rounded-xl border border-white/5">
+                                <i data-lucide="headphones" class="w-5 h-5 text-brandRed flex-shrink-0"></i>
+                                <span class="text-xs font-semibold text-gray-200">Soporte humano 24/7</span>
+                            </div>
+                            <div class="flex items-center space-x-3 bg-black/40 p-3 rounded-xl border border-white/5">
+                                <i data-lucide="zap" class="w-5 h-5 text-brandRed flex-shrink-0"></i>
+                                <span class="text-xs font-semibold text-gray-200">Entrega en segundos</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-4 flex flex-col items-center justify-center bg-black/50 p-6 rounded-2xl border border-white/10 text-center space-y-4">
+                        <div class="w-14 h-14 rounded-2xl bg-brandRed flex items-center justify-center text-white shadow-neon">
+                            <i data-lucide="message-square" class="w-7 h-7"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-white text-base">¿Tienes dudas o necesitas ayuda?</h3>
+                            <p class="text-xs text-gray-400 mt-1">Escríbenos directamente a nuestro canal de atención al cliente oficial.</p>
+                        </div>
+                        <a href="https://wa.me/" target="_blank" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-4 rounded-xl text-xs transition-all flex items-center justify-center gap-2 shadow-lg">
+                            <i data-lucide="phone" class="w-4 h-4"></i> Contactar por WhatsApp
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-black border-t border-white/10 pt-16 pb-12 text-gray-400 text-xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
+                <div class="space-y-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-brandRed to-black flex items-center justify-center shadow-neon">
+                            <i data-lucide="zap" class="w-5 h-5 text-white fill-white"></i>
+                        </div>
+                        <span class="text-lg font-black tracking-wider text-white">SERVI<span class="text-brandRed">NETWORK</span></span>
+                    </div>
+                    <p class="text-gray-400 leading-relaxed">
+                        Tu tienda digital líder en distribución de cuentas de streaming con entrega automatizada y garantía asegurada.
+                    </p>
+                </div>
+
+                <div>
+                    <h4 class="font-bold text-white text-sm mb-4 uppercase tracking-wider">Categorías</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#catalogo" class="hover:text-brandRed transition-colors">Netflix Ultra HD</a></li>
+                        <li><a href="#catalogo" class="hover:text-brandRed transition-colors">Disney+ & Star+</a></li>
+                        <li><a href="#catalogo" class="hover:text-brandRed transition-colors">Max (HBO)</a></li>
+                        <li><a href="#catalogo" class="hover:text-brandRed transition-colors">Spotify Familiar</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-bold text-white text-sm mb-4 uppercase tracking-wider">Legal & Ayuda</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="hover:text-brandRed transition-colors">Términos de Servicio</a></li>
+                        <li><a href="#" class="hover:text-brandRed transition-colors">Política de Garantía</a></li>
+                        <li><a href="#" class="hover:text-brandRed transition-colors">Preguntas Frecuentes</a></li>
+                        <li><a href="#" class="hover:text-brandRed transition-colors">Centro de Soporte</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-bold text-white text-sm mb-4 uppercase tracking-wider">Newsletter VIP</h4>
+                    <p class="text-gray-400 mb-3">Recibe cupones de descuento exclusivos y ofertas relámpago.</p>
+                    <form onsubmit="event.preventDefault(); showToast('¡Suscrito con éxito!', 'Te enviaremos ofertas y cupones pronto.');" class="space-y-2">
+                        <input type="email" placeholder="Tu correo electrónico" required class="w-full bg-cardBg border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-brandRed">
+                        <button type="submit" class="w-full bg-brandRed hover:bg-brandRedHover text-white font-bold py-2.5 rounded-xl transition-all shadow-neon">Suscribirme</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="pt-8 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between text-gray-500 text-[11px]">
+                <p>&copy; 2026 ServiNetwork. Todos los derechos reservados.</p>
+                <p class="mt-2 sm:mt-0">Diseñado con estética futurista roja y negra.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- CART SLIDE-OVER / MODAL -->
+    <div id="cartModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden transition-opacity duration-300 flex justify-end">
+        <div class="w-full max-w-md bg-cardBg h-full border-l border-white/10 p-6 flex flex-col justify-between shadow-2xl transform translate-x-full transition-transform duration-300" id="cartContentPanel">
+            <!-- Header -->
+            <div>
+                <div class="flex items-center justify-between pb-4 border-b border-white/10">
+                    <div class="flex items-center space-x-2">
+                        <i data-lucide="shopping-cart" class="w-5 h-5 text-brandRed"></i>
+                        <h3 class="font-bold text-white text-base">Tu Carrito de Compras</h3>
+                    </div>
+                    <button onclick="toggleCartModal()" class="p-2 rounded-xl bg-black/40 hover:bg-brandRed hover:text-white text-gray-400 transition-colors">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+
+                <!-- Items Container -->
+                <div id="cart-items-container" class="py-4 space-y-4 overflow-y-auto max-h-[50vh]">
+                    <!-- Dynamically populated or empty message -->
+                    <div class="text-center py-12 text-gray-500">
+                        <i data-lucide="shopping-cart" class="w-12 h-12 mx-auto mb-3 opacity-30"></i>
+                        <p class="text-sm">Tu carrito está vacío</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer / Checkout -->
+            <div class="pt-4 border-t border-white/10 space-y-4">
+                <div class="space-y-2">
+                    <div class="flex justify-between text-xs text-gray-400">
+                        <span>Subtotal</span>
+                        <span id="cart-subtotal">$0.00</span>
+                    </div>
+                    <div class="flex justify-between text-xs text-gray-400">
+                        <span>Descuento de la plataforma</span>
+                        <span class="text-brandRed">-$0.00</span>
+                    </div>
+                    <div class="flex justify-between text-base font-black text-white pt-2 border-t border-white/5">
+                        <span>Total a Pagar</span>
+                        <span id="cart-total" class="text-brandRed">$0.00</span>
+                    </div>
+                </div>
+
+                <button onclick="checkout()" class="w-full bg-gradient-to-r from-brandRed to-rose-700 hover:from-rose-600 hover:to-brandRed text-white font-bold py-3.5 rounded-xl shadow-neon transition-all hover:scale-105 flex items-center justify-center space-x-2 text-sm">
+                    <i data-lucide="shield-check" class="w-4 h-4"></i>
+                    <span>Proceder al Pago Seguro</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AUTH MODAL (Login / Register) -->
+    <div id="authModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="glass-card w-full max-w-md p-8 rounded-3xl border border-white/10 shadow-2xl relative space-y-6">
+            <button onclick="closeAuthModal()" class="absolute top-6 right-6 p-2 rounded-xl bg-black/40 text-gray-400 hover:text-white hover:bg-brandRed transition-colors">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+
+            <div class="text-center space-y-2">
+                <div class="w-12 h-12 rounded-2xl bg-brandRed mx-auto flex items-center justify-center text-white shadow-neon mb-2">
+                    <i data-lucide="user" class="w-6 h-6"></i>
+                </div>
+                <h3 class="text-2xl font-black text-white" id="auth-modal-title">Iniciar Sesión</h3>
+                <p class="text-xs text-gray-400">Accede a tu panel de cuentas y compras activas.</p>
+            </div>
+
+            <form onsubmit="handleAuthSubmit(event)" class="space-y-4">
+                <div id="name-field-container" class="hidden space-y-1">
+                    <label class="text-xs font-semibold text-gray-300">Nombre Completo</label>
+                    <input type="text" id="reg-name" placeholder="Tu nombre" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-brandRed">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-xs font-semibold text-gray-300">Correo Electrónico</label>
+                    <input type="email" id="auth-email" required placeholder="correo@ejemplo.com" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-brandRed">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-xs font-semibold text-gray-300">Contraseña</label>
+                    <input type="password" id="auth-password" required placeholder="••••••••" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-brandRed">
+                </div>
+
+                <button type="submit" id="auth-submit-btn" class="w-full bg-brandRed hover:bg-brandRedHover text-white font-bold py-3.5 rounded-xl shadow-neon text-xs transition-all">
+                    Iniciar Sesión
+                </button>
+            </form>
+
+            <div class="text-center pt-2">
+                <p class="text-xs text-gray-400" id="auth-switch-text">
+                    ¿No tienes una cuenta? <button onclick="toggleAuthMode()" class="text-brandRed font-bold hover:underline">Regístrate aquí</button>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SUCCESS CHECKOUT SIMULATION MODAL -->
+    <div id="successModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="glass-card w-full max-w-md p-8 rounded-3xl border border-white/10 shadow-2xl text-center space-y-6">
+            <div class="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 mx-auto flex items-center justify-center border border-emerald-500/40 shadow-lg animate-bounce">
+                <i data-lucide="check" class="w-8 h-8"></i>
+            </div>
+            
+            <div class="space-y-2">
+                <h3 class="text-2xl font-black text-white">¡Compra Simulada con Éxito!</h3>
+                <p class="text-xs text-gray-300">Tus datos de acceso han sido generados y enviados a tu simulación de correo con éxito.</p>
+            </div>
+
+            <div class="bg-black/50 p-4 rounded-2xl border border-white/5 text-left space-y-2">
+                <div class="flex justify-between text-xs text-gray-400">
+                    <span>Estado del Pedido:</span>
+                    <span class="text-emerald-400 font-bold">Completado Automático</span>
+                </div>
+                <div class="flex justify-between text-xs text-gray-400">
+                    <span>Método de Entrega:</span>
+                    <span class="text-white">Instantáneo (Panel Web)</span>
+                </div>
+            </div>
+
+            <button onclick="closeSuccessModal()" class="w-full bg-brandRed hover:bg-brandRedHover text-white font-bold py-3.5 rounded-xl shadow-neon text-xs transition-all">
+                Volver a la Tienda
+            </button>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Cart State
+        let cart = [];
+
+        // Toast Notification Function
+        function showToast(title, desc) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-title').innerText = title;
+            document.getElementById('toast-desc').innerText = desc;
+            toast.classList.remove('translate-y-24', 'opacity-0', 'pointer-events-none');
+            setTimeout(() => {
+                toast.classList.add('translate-y-24', 'opacity-0', 'pointer-events-none');
+            }, 3500);
+        }
+
+        // Add to Cart
+        function addToCart(name, price, image) {
+            const existingItem = cart.find(item => item.name === name);
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({ name, price, image, quantity: 1 });
+            }
+            updateCartUI();
+            showToast('¡Producto añadido!', `${name} agregado al carrito.`);
+        }
+
+        function quickBuyCombo(name, price) {
+            addToCart(name, price, 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=100&auto=format&fit=crop&q=60');
+            toggleCartModal();
+        }
+
+        // Update Cart UI
+        function updateCartUI() {
+            const badge = document.getElementById('cart-badge');
+            const container = document.getElementById('cart-items-container');
+            const subtotalEl = document.getElementById('cart-subtotal');
+            const totalEl = document.getElementById('cart-total');
+
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            
+            if (totalItems > 0) {
+                badge.innerText = totalItems;
+                badge.classList.remove('scale-0');
+            } else {
+                badge.classList.add('scale-0');
+            }
+
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12 text-gray-500">
+                        <i data-lucide="shopping-cart" class="w-12 h-12 mx-auto mb-3 opacity-30"></i>
+                        <p class="text-sm">Tu carrito está vacío</p>
+                    </div>
+                `;
+                subtotalEl.innerText = '$0.00';
+                totalEl.innerText = '$0.00';
+                lucide.createIcons();
+                return;
+            }
+
+            let subtotal = 0;
+            container.innerHTML = cart.map((item, index) => {
+                subtotal += item.price * item.quantity;
+                return `
+                    <div class="flex items-center justify-between bg-black/40 p-3 rounded-2xl border border-white/5 gap-3">
+                        <img src="${item.image}" alt="${item.name}" class="w-12 h-12 object-cover rounded-xl border border-white/10" onerror="this.src='https://placehold.co/50x50/141414/ff1e38?text=App'">
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-xs font-bold text-white truncate">${item.name}</h4>
+                            <p class="text-xs text-brandRed font-bold">$${item.price.toFixed(2)} x ${item.quantity}</p>
+                        </div>
+                        <div class="flex items-center space-x-1">
+                            <button onclick="changeQuantity(${index}, 1)" class="w-7 h-7 bg-cardBg hover:bg-brandRed rounded-lg text-white flex items-center justify-center transition-colors text-xs">+</button>
+                            <button onclick="changeQuantity(${index}, -1)" class="w-7 h-7 bg-cardBg hover:bg-brandRed rounded-lg text-white flex items-center justify-center transition-colors text-xs">-</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            subtotalEl.innerText = `$${subtotal.toFixed(2)}`;
+            totalEl.innerText = `$${subtotal.toFixed(2)}`;
+            lucide.createIcons();
+        }
+
+        function changeQuantity(index, delta) {
+            cart[index].quantity += delta;
+            if (cart[index].quantity <= 0) {
+                cart.splice(index, 1);
+            }
+            updateCartUI();
+        }
+
+        // Toggle Cart Modal
+        function toggleCartModal() {
+            const modal = document.getElementById('cartModal');
+            const panel = document.getElementById('cartContentPanel');
+            if (modal.classList.contains('hidden')) {
+                modal.classList.remove('hidden');
+                setTimeout(() => panel.classList.remove('translate-x-full'), 10);
+            } else {
+                panel.classList.add('translate-x-full');
+                setTimeout(() => modal.classList.add('hidden'), 300);
+            }
+        }
+
+        // Checkout Simulation
+        function checkout() {
+            if (cart.length === 0) {
+                showToast('Carrito vacío', 'Agrega productos antes de pagar.');
+                return;
+            }
+            toggleCartModal();
+            const successModal = document.getElementById('successModal');
+            successModal.classList.remove('hidden');
+            successModal.classList.add('flex');
+            cart = [];
+            updateCartUI();
+        }
+
+        function closeSuccessModal() {
+            const successModal = document.getElementById('successModal');
+            successModal.classList.add('hidden');
+            successModal.classList.remove('flex');
+        }
+
+        // Auth Modal Control
+        let isRegisterMode = false;
+
+        function openAuthModal() {
+            const modal = document.getElementById('authModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeAuthModal() {
+            const modal = document.getElementById('authModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function toggleAuthMode() {
+            isRegisterMode = !isRegisterMode;
+            const title = document.getElementById('auth-modal-title');
+            const btn = document.getElementById('auth-submit-btn');
+            const nameField = document.getElementById('name-field-container');
+            const switchText = document.getElementById('auth-switch-text');
+
+            if (isRegisterMode) {
+                title.innerText = "Crear Cuenta";
+                btn.innerText = "Registrarse";
+                nameField.classList.remove('hidden');
+                switchText.innerHTML = `¿Ya tienes cuenta? <button onclick="toggleAuthMode()" class="text-brandRed font-bold hover:underline">Inicia Sesión</button>`;
+            } else {
+                title.innerText = "Iniciar Sesión";
+                btn.innerText = "Iniciar Sesión";
+                nameField.classList.add('hidden');
+                switchText.innerHTML = `¿No tienes una cuenta? <button onclick="toggleAuthMode()" class="text-brandRed font-bold hover:underline">Regístrate aquí</button>`;
+            }
+        }
+
+        function handleAuthSubmit(e) {
+            e.preventDefault();
+            const email = document.getElementById('auth-email').value;
+            closeAuthModal();
+            showToast(isRegisterMode ? '¡Registro exitoso!' : '¡Bienvenido de nuevo!', `Sesión iniciada con ${email}`);
+        }
+
+        // Mobile Menu Toggle
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        // Filter Products
+        function filterProducts(category) {
+            // Update active buttons styling
+            const buttons = document.querySelectorAll('#category-filters button');
+            buttons.forEach(btn => {
+                btn.classList.remove('bg-brandRed', 'text-white', 'shadow-neon');
+                btn.classList.add('bg-cardBg', 'text-gray-300');
+            });
+            event.target.classList.remove('bg-cardBg', 'text-gray-300');
+            event.target.classList.add('bg-brandRed', 'text-white', 'shadow-neon');
+
+            const cards = document.querySelectorAll('.product-card');
+            cards.forEach(card => {
+                const cat = card.getAttribute('data-category');
+                if (category === 'all' || cat === category) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Search Input Filter
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const term = e.target.value.toLowerCase();
+            const cards = document.querySelectorAll('.product-card');
+            cards.forEach(card => {
+                const name = card.getAttribute('data-name');
+                if (name.includes(term)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
